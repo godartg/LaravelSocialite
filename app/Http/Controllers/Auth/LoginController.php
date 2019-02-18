@@ -40,13 +40,14 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
     /**
-     * Redirect the user to the GitHub authentication page.
+     * Redirect the user to the Provider authentication page.
      *
      * @return \Illuminate\Http\Response
      */
-    public function redirectToProvider()
+    public function redirectToProvider($provider)
     {
-        return Socialite::driver('github')->redirect();
+        $parameters = ['access_type' => 'offline'];
+        return Socialite::driver($provider)->scopes(["https://www.googleapis.com/auth/drive"])->redirect();
     }
 
     /**
@@ -54,23 +55,22 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function handleProviderCallback()
+    public function handleProviderCallback($provider)
     {
-        $githubUser = Socialite::driver('github')->user();
+        $providerUser = Socialite::driver($provider)->user();
         
-        $user = User::where('provider_id', $githubUser->getId())->first();
-        if(!$user){
-            //add user to database
-            $user = User::create([
-                'email' => $githubUser->getEmail(),
-                'name' => $githubUser->getName(),
-                'provider_id' => $githubUser->getId(),
-                'provider' => 'github'
-            ]);
-        }
+        $user = User::updateOrCreate(   ['email'        =>  $userLogin->email], 
+                                        ['refresh_token'=>  $userLogin->token],
+                                        ['name'         =>  $userLogin->name]);
         
         // $user->token;
         Auth::Login($user, true);
         return redirect($this->redirectTo);
+    }
+    public function logout(request $request){
+        session('g_token', '');
+        $this->guard()->logout();
+        $request->session()->invalidate();
+        return redirect($redirectTo);
     }
 }

@@ -19,6 +19,12 @@ Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
 
+//Rutas de autenticación con redes sociales
 Route::get('login/{provider}', 'SocialAuthController@redirectToProvider');
 Route::get('login/{provider}/callback', 'SocialAuthController@handleProviderCallback');
 
+//Rutas para API de GOOGLE DRIVE
+Route::get('/api', 'GoogleDriveController@getFolders');
+Route::get('/api/upload', 'GoogleDriveController@uploadFiles');
+Route::post('/api/upload', 'GoogleDriveController@getFiles');
+Route::get('/api', 'GoogleDriveController@getFiles');

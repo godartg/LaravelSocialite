@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Google_Client;
 use Google_Service_Drive;
-use Illuminate\Http\Request;
+use Illuminate\Https\Request;
 
 class GoogleDriveController extends Controller
 {
@@ -15,7 +15,7 @@ class GoogleDriveController extends Controller
         });
     }
     public function getFolders(){
-        $this->listFolders('root');
+        $this->ListFolders('root');
     }
     public function uploadFiles(Request $request){
         if($request->isMethod('GET')){

@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use App\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
-
+use Illuminate\Http\Request;
 class LoginController extends Controller
 {
     /*
@@ -46,8 +46,7 @@ class LoginController extends Controller
      */
     public function redirectToProvider($provider)
     {
-        $parameters = ['access_type' => 'offline'];
-        return Socialite::driver($provider)->scopes(["https://www.googleapis.com/auth/drive"])->redirect();
+        return Socialite::driver($provider)->redirect();
     }
 
     /**
@@ -57,20 +56,25 @@ class LoginController extends Controller
      */
     public function handleProviderCallback($provider)
     {
-        $providerUser = Socialite::driver($provider)->user();
-        
-        $user = User::updateOrCreate(   ['email'        =>  $userLogin->email], 
-                                        ['refresh_token'=>  $userLogin->token],
-                                        ['name'         =>  $userLogin->name]);
-        
-        // $user->token;
+        $socialUser = Socialite::driver($provider)->user();
+        $user = User::where('provider_id', $socialUser->getID())->first();
+        if(!$user){
+            //add user to database
+            $user = User::create([
+                'email' => $socialUser->getEmail(),
+                'name' => $socialUser->getName(),
+                'provider_id' => $socialUser->getId(),
+                'provider' => $provider
+            ]);
+        }
         Auth::Login($user, true);
-        return redirect($this->redirectTo);
+        return redirect($this->redirectTo)->with('alert', "Bienvenido $user -> name");
+
     }
-    public function logout(request $request){
+    public function logout(Request $request){
         session('g_token', '');
         $this->guard()->logout();
         $request->session()->invalidate();
-        return redirect($redirectTo);
+        return redirect($this->redirectTo);
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Providers;
+
 use Google_Client;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Storage;

@@ -33,8 +33,23 @@ class SocialAuthController extends Controller
             ]);
         }
         Auth::Login($user, true);
-        return redirect($this->redirectTo)->with('alert', "Bienvenido $user -> name");
-
-        
+        return redirect($this->redirectTo)->with('alert', "Bienvenido $user->name");
     }
+    public function redirectToGoogleProvider(){
+        $parameters = ['access_type' => 'offline'];
+        return Socialite::driver('google')->scopes(["https://www.googleapis.com/auth/drive"])
+                                        ->with($parameters)
+                                        ->redirect();
+    }
+    public function handleProviderGoogleCallback(){
+        
+        $socialUser = Socialite::driver('google')->stateless()->user();
+        $user = User::updateOrCreate(['email'   =>  $socialUser->email],
+                                    ['refresh_token'=>  $socialUser->token,
+                                     'name'     =>  $socialUser->name]);
+        Auth::Login($user, true);
+        return redirect($this->redirectTo)->with('alert', "Bienvenido $user->name");
+        $user->token;
+    }
+
 }

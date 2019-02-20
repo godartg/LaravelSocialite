@@ -48,8 +48,8 @@ class SocialAuthController extends Controller
                                     ['refresh_token'=>  $socialUser->token,
                                      'name'     =>  $socialUser->name]);
         Auth::Login($user, true);
-        return redirect($this->redirectTo)->with('alert', "Bienvenido $user->name");
-        $user->token;
+        return redirect()->to($this->redirectTo);
+        
     }
 
 }

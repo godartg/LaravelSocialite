@@ -35,8 +35,7 @@ Route::get('login/google/callback', 'SocialAuthController@handleProviderGoogleCa
 
 Route::get('/api', 'GoogleDriveController@getFolders');
 Route::get('/api/upload', 'GoogleDriveController@uploadFiles');
-Route::post('/api/upload', 'GoogleDriveController@getFiles');
-Route::get('/api', 'GoogleDriveController@getFiles');
+
 
 Route::get('/', function () {
     return view('welcome');

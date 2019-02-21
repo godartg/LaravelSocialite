@@ -24,7 +24,7 @@ Route::get('/condiciones', function(){
 });
 
 //Rutas de autenticación con redes sociales
-Route::get('login/google', 'SocialAuthController@redirectToGoogleProvider');
+Route::get('login/google', 'SocialAuthController@redirectToGoogleProvider')->name('login.google');
 Route::get('login/google/callback', 'SocialAuthController@handleProviderGoogleCallback');
 
 //Route::get('login/{provider}', 'SocialAuthController@redirectToProvider');
@@ -32,9 +32,11 @@ Route::get('login/google/callback', 'SocialAuthController@handleProviderGoogleCa
 
 
 //Rutas para API de GOOGLE DRIVE
+Route::middleware('auth')->group(function(){
+    Route::get('/api', 'GoogleDriveController@getFolders')->name('google.folders');
+    Route::get('/api/upload', 'GoogleDriveController@uploadFiles');
+});
 
-Route::get('/api', 'GoogleDriveController@getFolders');
-Route::get('/api/upload', 'GoogleDriveController@uploadFiles');
 
 
 Route::get('/', function () {
